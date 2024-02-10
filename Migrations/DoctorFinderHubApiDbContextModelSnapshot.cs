@@ -22,6 +22,79 @@ namespace DoctorFinderHubApi.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("DoctorFinderHubApi.Models.Admin", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AdminAuthId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("FileDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileExtension")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("FileSizeInBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("fileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdminAuthId");
+
+                    b.ToTable("admins");
+                });
+
+            modelBuilder.Entity("DoctorFinderHubApi.Models.AdminAuth", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AdminName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("PasswordResetToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("PasswordSalt")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<DateTime?>("ResetTokenExpires")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("VerificationToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("VerifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("adminAuths");
+                });
+
             modelBuilder.Entity("DoctorFinderHubApi.Models.BookingAppointment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -36,22 +109,56 @@ namespace DoctorFinderHubApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("DoctorId")
+                    b.Property<Guid>("DoctorAuthId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("PatientId")
+                    b.Property<Guid>("PatientAuthId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DoctorId");
+                    b.HasIndex("DoctorAuthId");
 
-                    b.HasIndex("PatientId");
+                    b.HasIndex("PatientAuthId");
 
                     b.ToTable("bookingAppointments");
                 });
 
             modelBuilder.Entity("DoctorFinderHubApi.Models.Doctor", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("DoctorAuthId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("FileDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileExtension")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("FileSizeInBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("fileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DoctorAuthId");
+
+                    b.ToTable("doctors");
+                });
+
+            modelBuilder.Entity("DoctorFinderHubApi.Models.DoctorAuth", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -72,20 +179,6 @@ namespace DoctorFinderHubApi.Migrations
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FileDescription")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FileExtension")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FilePath")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("FileSizeInBytes")
-                        .HasColumnType("bigint");
 
                     b.Property<byte[]>("PasswordHash")
                         .IsRequired()
@@ -111,13 +204,9 @@ namespace DoctorFinderHubApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("fileName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
-                    b.ToTable("doctors");
+                    b.ToTable("doctorAuths");
                 });
 
             modelBuilder.Entity("DoctorFinderHubApi.Models.Feedback", b =>
@@ -160,6 +249,26 @@ namespace DoctorFinderHubApi.Migrations
                     b.Property<long>("FileSizeInBytes")
                         .HasColumnType("bigint");
 
+                    b.Property<Guid>("PatientAuthId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("fileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PatientAuthId");
+
+                    b.ToTable("patients");
+                });
+
+            modelBuilder.Entity("DoctorFinderHubApi.Models.PatientAuth", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<byte[]>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
@@ -192,32 +301,50 @@ namespace DoctorFinderHubApi.Migrations
                     b.Property<DateTime?>("VerifiedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("fileName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
-                    b.ToTable("patients");
+                    b.ToTable("patientAuths");
+                });
+
+            modelBuilder.Entity("DoctorFinderHubApi.Models.Admin", b =>
+                {
+                    b.HasOne("DoctorFinderHubApi.Models.AdminAuth", "AdminAuth")
+                        .WithMany()
+                        .HasForeignKey("AdminAuthId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AdminAuth");
                 });
 
             modelBuilder.Entity("DoctorFinderHubApi.Models.BookingAppointment", b =>
                 {
-                    b.HasOne("DoctorFinderHubApi.Models.Doctor", "Doctor")
+                    b.HasOne("DoctorFinderHubApi.Models.DoctorAuth", "DoctorAuth")
                         .WithMany()
-                        .HasForeignKey("DoctorId")
+                        .HasForeignKey("DoctorAuthId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DoctorFinderHubApi.Models.Patient", "Patient")
+                    b.HasOne("DoctorFinderHubApi.Models.PatientAuth", "PatientAuth")
                         .WithMany()
-                        .HasForeignKey("PatientId")
+                        .HasForeignKey("PatientAuthId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Doctor");
+                    b.Navigation("DoctorAuth");
 
-                    b.Navigation("Patient");
+                    b.Navigation("PatientAuth");
+                });
+
+            modelBuilder.Entity("DoctorFinderHubApi.Models.Doctor", b =>
+                {
+                    b.HasOne("DoctorFinderHubApi.Models.DoctorAuth", "DoctorAuth")
+                        .WithMany()
+                        .HasForeignKey("DoctorAuthId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DoctorAuth");
                 });
 
             modelBuilder.Entity("DoctorFinderHubApi.Models.Feedback", b =>
@@ -229,6 +356,17 @@ namespace DoctorFinderHubApi.Migrations
                         .IsRequired();
 
                     b.Navigation("Patient");
+                });
+
+            modelBuilder.Entity("DoctorFinderHubApi.Models.Patient", b =>
+                {
+                    b.HasOne("DoctorFinderHubApi.Models.PatientAuth", "PatientAuth")
+                        .WithMany()
+                        .HasForeignKey("PatientAuthId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PatientAuth");
                 });
 #pragma warning restore 612, 618
         }

@@ -5,14 +5,7 @@ namespace DoctorFinderHubApi.Models
     public class Admin
     {
         public Guid Id { get; set; }
-        public string AdminName { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public byte[] PasswordHash { get; set; } = new byte[32];
-        public byte[] PasswordSalt { get; set; } = new byte[32];
-        public string? VerificationToken { get; set; }
-        public DateTime? VerifiedAt { get; set; }
-        public string? PasswordResetToken { get; set; }
-        public DateTime? ResetTokenExpires { get; set; }
+       
 
         [NotMapped]
         public IFormFile File { get; set; }
@@ -24,5 +17,11 @@ namespace DoctorFinderHubApi.Models
         public long FileSizeInBytes { get; set; }
 
         public string FilePath { get; set; }
+
+        public Guid AdminAuthId { get; set; }
+
+        //Navigation Property
+
+        public AdminAuth AdminAuth { get; set; }
     }
 }

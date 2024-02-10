@@ -10,7 +10,13 @@ namespace DoctorFinderHubApi.Data
 
         }
         public DbSet<Doctor> doctors { get; set; }
+        public DbSet<DoctorAuth> doctorAuths { get; set; }
         public DbSet<Patient> patients { get; set; }
+        public DbSet<PatientAuth> patientAuths { get; set; }
+
+        public DbSet<Admin> admins { get; set; }
+
+        public DbSet<AdminAuth> adminAuths { get; set; }
 
         public DbSet<BookingAppointment> bookingAppointments { get; set; }
 
