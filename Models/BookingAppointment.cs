@@ -11,15 +11,16 @@ namespace DoctorFinderHubApi.Models
 
         public string BookingDate { get; set; }
         public string BookingTime { get; set; }
-        public Guid DoctorId { get; set; }
-        public Guid PatientId { get; set; }
+        public Guid DoctorAuthId { get; set; }
+        public Guid PatientAuthId { get; set; }
 
 
 
 
         //Navigation properties
-        public Doctor Doctor { get; set; }
-        public Patient Patient  { get; set; }
+        public DoctorAuth DoctorAuth { get; set; }
+
+        public PatientAuth PatientAuth { get; set; }
        
     }
 }
