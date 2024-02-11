@@ -17,5 +17,10 @@ namespace DoctorFinderHubApi.Repository.DoctorRepo.Implementations
             doctorFinderHubApiDbContext.doctorAuths.Add(doctorAuth);
             await doctorFinderHubApiDbContext.SaveChangesAsync();
         }
+
+        public async Task SaveDoctorAsync()
+        {
+            await doctorFinderHubApiDbContext.SaveChangesAsync();
+        }
     }
 }
