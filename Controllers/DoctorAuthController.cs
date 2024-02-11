@@ -7,6 +7,7 @@ using DoctorFinderHubApi.Models;
 using DoctorFinderHubApi.Services.DoctorServices.Interfaces;
 using MailKit.Security;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -61,8 +62,91 @@ namespace DoctorFinderHubApi.Controllers
         }
 
 
+        [HttpPost("DoctorVerify")]
 
-       
+        public  async Task<IActionResult> Verify(string Token)
+        {
+            var doctor = doctorFinderHubApiDbContext.doctorAuths.FirstOrDefault(d => d.VerificationToken == Token);
+            if (doctor == null)
+            {
+                return BadRequest("Verification is not match");
+            }
+            doctor.VerifiedAt = DateTime.Now;
+            await doctorFinderHubApiDbContext.SaveChangesAsync();
+            return Ok("Doctor Verified");
+
+        }
+
+        [HttpPost("Login")]
+
+        public async Task<ActionResult<string>> Login(DoctorLoginDto doctorLoginDto)
+        {
+            var doctor= doctorFinderHubApiDbContext.doctorAuths.FirstOrDefault(d=>d.Email== doctorLoginDto.Email);
+            if(doctor==null)
+            {
+                return BadRequest("The Email  is incorrect ");
+            }
+
+            if(!VerifyPasswordHash(doctorLoginDto.Password,doctor.PasswordHash,doctor.PasswordSalt))
+            {
+                return BadRequest("Wrong password.");
+
+            }
+            if (doctor.VerifiedAt == null)
+            {
+                return BadRequest("doctor is not verified");
+            }
+            return Ok($"welcome back {doctorLoginDto.Email}! :)");
+
+        }
+
+        [HttpPost("Forget Password")]
+        public async Task<IActionResult> ForgetPassword(string Email)
+        {
+            var doctor= doctorFinderHubApiDbContext.doctorAuths.FirstOrDefault(u=>u.Email==Email);
+            if(doctor==null)
+            {
+                return BadRequest("Enter the Correct Email");
+
+
+            }
+
+            doctor.PasswordResetToken = doctorService.CreateToken(doctor);
+            doctor.ResetTokenExpires = DateTime.Now.AddDays(1);
+            doctorService.SendMail(doctor.PasswordResetToken, Email);
+            await doctorFinderHubApiDbContext.SaveChangesAsync();
+            return Ok("You Can Now Reset The Password");
+        }
+
+        [HttpPost("Reset Password")]
+
+        public async Task<IActionResult> ResetPassword(ResetPassword resetPassword)
+        {
+            var doctor = doctorFinderHubApiDbContext.doctorAuths.FirstOrDefault(u => u.PasswordResetToken == resetPassword.Token);
+            if (doctor == null || doctor.ResetTokenExpires< DateTime.Now)
+            {
+                return BadRequest("Invalid Token");
+            }
+            doctorService.CreatePasswordHash(resetPassword.Password, out byte[] PasswordHash, out byte[] PasswordSalt);
+            doctor.PasswordHash = PasswordHash;
+            doctor.PasswordSalt = PasswordSalt;
+            doctor.ResetTokenExpires = null;
+            doctor.PasswordResetToken= null;
+            await doctorFinderHubApiDbContext.SaveChangesAsync();
+            return Ok("Password Reset Successfully");
+        }
+
+        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        {
+            using (var hmac = new HMACSHA512(passwordSalt))
+            {
+                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                return computedHash.SequenceEqual(passwordHash);
+            }
+        }
+
+
+
 
     }
 }
