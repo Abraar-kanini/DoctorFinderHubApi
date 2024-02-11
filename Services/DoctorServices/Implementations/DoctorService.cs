@@ -9,6 +9,8 @@ using Microsoft.IdentityModel.Tokens;
 using MimeKit.Text;
 using MimeKit;
 using DoctorFinderHubApi.Repository.DoctorRepo.Interfaces;
+using DoctorFinderHubApi.Data;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DoctorFinderHubApi.Services.DoctorServices.Implementations
 {
@@ -16,11 +18,13 @@ namespace DoctorFinderHubApi.Services.DoctorServices.Implementations
     {
         private readonly IConfiguration configuration;
         private readonly IDoctorRepo doctorRepo1;
+        private readonly DoctorFinderHubApiDbContext doctorFinderHubApiDbContext;
 
-        public DoctorService(IConfiguration configuration , IDoctorRepo doctorRepo)
+        public DoctorService(IConfiguration configuration , IDoctorRepo doctorRepo,DoctorFinderHubApiDbContext doctorFinderHubApiDbContext )
         {
             this.configuration = configuration;
             doctorRepo1 = doctorRepo;
+            this.doctorFinderHubApiDbContext = doctorFinderHubApiDbContext;
         }
 
         public IDoctorRepo DoctorRepo { get; }
@@ -63,6 +67,17 @@ namespace DoctorFinderHubApi.Services.DoctorServices.Implementations
             return jwt;
 
         }
+
+        public async Task<List<DoctorAuth>> FilterDoctorsAsyn(string? filterOn, string? filterQuery)
+        {
+            if (string.IsNullOrWhiteSpace(filterOn) || string.IsNullOrWhiteSpace(filterQuery))
+            {
+                return null; // Return null if parameters are invalid
+            }
+
+            return await doctorRepo1.GetDoctorsAysnc(filterOn, filterQuery);
+        }
+
 
         public Task SaveDoctorAsync()
         {

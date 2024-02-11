@@ -9,6 +9,7 @@ using MailKit.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using MimeKit;
@@ -136,7 +137,47 @@ namespace DoctorFinderHubApi.Controllers
             return Ok("Password Reset Successfully");
         }
 
-       
+
+        [HttpGet("GetAllDoctors")]
+
+        public async Task<List<DoctorAuth>> GetDoctors()
+        {
+          var doctors=  await doctorFinderHubApiDbContext.doctorAuths.ToListAsync();
+            return doctors;
+        }
+
+        [HttpGet]
+        [Route("{id:Guid}")]
+
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var doctor = await doctorFinderHubApiDbContext.doctorAuths.FindAsync(id);
+            if (doctor == null)
+            {
+                return BadRequest("Doctor Not Exist");
+            }
+
+            return Ok(doctor);
+        }
+
+        [HttpGet("filter")]
+        public async Task<IActionResult> FilterDoctor([FromQuery] string? filterOn, [FromQuery] string? filterQuery)
+        {
+            if (string.IsNullOrWhiteSpace(filterOn) || string.IsNullOrWhiteSpace(filterQuery))
+            {
+                ModelState.AddModelError("", "Please provide both filterOn and filterQuery parameters.");
+                return BadRequest(ModelState);
+            }
+
+            var result = await doctorService.FilterDoctorsAsyn(filterOn, filterQuery);
+            if (result == null || !result.Any()) // Check if the result is null or empty
+            {
+                ModelState.AddModelError("", "No results found for the given parameters.");
+                return BadRequest(ModelState);
+            }
+            return Ok(result);
+        }
+
 
 
 
