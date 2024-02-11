@@ -36,7 +36,7 @@ namespace DoctorFinderHubApi.Controllers
 
         public async Task<ActionResult<DoctorAuth>> DoctorRegister(DoctorAuthPostDto DoctorAuthPostDto)
         {
-            if (doctorFinderHubApiDbContext.doctorAuths.Any(doctorname => doctorname.DoctorName == DoctorAuthPostDto.DoctorName))
+            if (doctorFinderHubApiDbContext.doctorAuths.Any(doctoremail => doctoremail.Email == DoctorAuthPostDto.Email))
             {
                 return BadRequest("Doctor Already Exist");
             }
@@ -54,7 +54,7 @@ namespace DoctorFinderHubApi.Controllers
             };
             doctordeatils.VerificationToken = doctorService.CreateToken(doctordeatils);
 
-            doctorService.SendMail(doctordeatils.VerificationToken, doctordeatils.Email);
+            doctorService.SendMail(doctordeatils.VerificationToken, doctordeatils.Email ,"Registered Successfully");
            
            await doctorService.AddDoctorAsync(doctordeatils);
             return Ok("User successfully created!");
@@ -87,7 +87,7 @@ namespace DoctorFinderHubApi.Controllers
                 return BadRequest("The Email  is incorrect ");
             }
 
-            if(!VerifyPasswordHash(doctorLoginDto.Password,doctor.PasswordHash,doctor.PasswordSalt))
+            if(!doctorService.VerifyPasswordHash(doctorLoginDto.Password,doctor.PasswordHash,doctor.PasswordSalt))
             {
                 return BadRequest("Wrong password.");
 
@@ -113,8 +113,8 @@ namespace DoctorFinderHubApi.Controllers
 
             doctor.PasswordResetToken = doctorService.CreateToken(doctor);
             doctor.ResetTokenExpires = DateTime.Now.AddDays(1);
-            doctorService.SendMail(doctor.PasswordResetToken, Email);
-            await doctorFinderHubApiDbContext.SaveChangesAsync();
+            doctorService.SendMail(doctor.PasswordResetToken, Email,"Email Verified");
+            await doctorService.SaveDoctorAsync();
             return Ok("You Can Now Reset The Password");
         }
 
@@ -136,14 +136,7 @@ namespace DoctorFinderHubApi.Controllers
             return Ok("Password Reset Successfully");
         }
 
-        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
-        {
-            using (var hmac = new HMACSHA512(passwordSalt))
-            {
-                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                return computedHash.SequenceEqual(passwordHash);
-            }
-        }
+       
 
 
 

@@ -45,7 +45,7 @@ namespace DoctorFinderHubApi.Services.DoctorServices.Implementations
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, doctorAuth.DoctorName),
-                new Claim(ClaimTypes.Role, "Admin")
+                new Claim(ClaimTypes.Role, "Doctor")
             };
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
@@ -64,13 +64,18 @@ namespace DoctorFinderHubApi.Services.DoctorServices.Implementations
 
         }
 
-        public void SendMail(string token, string recipientEmail)
+        public Task SaveDoctorAsync()
+        {
+            return doctorRepo1.SaveDoctorAsync();
+        }
+
+        public void SendMail(string token, string recipientEmail, String Body)
         {
             var emailMessage = new MimeMessage();
 
             emailMessage.From.Add(MailboxAddress.Parse("jabraar01@gmail.com"));
             emailMessage.To.Add(MailboxAddress.Parse(recipientEmail));
-            emailMessage.Subject = "Registered Successfully";
+            emailMessage.Subject = $"{Body}";
 
             // Concatenate the random number with the email body
             string body = $"Your token  is: {token} ";
@@ -81,6 +86,15 @@ namespace DoctorFinderHubApi.Services.DoctorServices.Implementations
             smtp.Authenticate("jabraar01@gmail.com", "vcfg espi csts buzv");
             smtp.Send(emailMessage);
             smtp.Disconnect(true);
+        }
+
+        public bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        {
+            using (var hmac = new HMACSHA512(passwordSalt))
+            {
+                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                return computedHash.SequenceEqual(passwordHash);
+            }
         }
     }
 }
