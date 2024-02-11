@@ -1,6 +1,7 @@
 ﻿using DoctorFinderHubApi.Data;
 using DoctorFinderHubApi.Models;
 using DoctorFinderHubApi.Repository.DoctorRepo.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace DoctorFinderHubApi.Repository.DoctorRepo.Implementations
 {
@@ -16,6 +17,20 @@ namespace DoctorFinderHubApi.Repository.DoctorRepo.Implementations
         {
             doctorFinderHubApiDbContext.doctorAuths.Add(doctorAuth);
             await doctorFinderHubApiDbContext.SaveChangesAsync();
+        }
+
+       
+
+        public async Task<List<DoctorAuth>> GetDoctorsAysnc(string? filterOn, string? filterQuery)
+        {
+            var doctor = doctorFinderHubApiDbContext.doctorAuths.AsQueryable();
+
+            if (filterOn.Equals("doctorSpecialist", StringComparison.OrdinalIgnoreCase))
+            {
+                doctor = doctor.Where(a => a.doctorSpecialist.Contains(filterQuery));
+            }
+
+           return await doctor.ToListAsync();
         }
 
         public async Task SaveDoctorAsync()

@@ -1,4 +1,5 @@
 ﻿using DoctorFinderHubApi.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DoctorFinderHubApi.Services.DoctorServices.Interfaces
 {
@@ -15,5 +16,7 @@ namespace DoctorFinderHubApi.Services.DoctorServices.Interfaces
         Task AddDoctorAsync(DoctorAuth doctorAuth);
 
         Task SaveDoctorAsync();
+
+        Task<List<DoctorAuth>> FilterDoctorsAsyn(string? filterOn , string? filterQuery);
     }
 }
