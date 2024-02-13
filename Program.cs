@@ -1,5 +1,5 @@
 using DoctorFinderHubApi.Data;
-
+using DoctorFinderHubApi.Mapping;
 using DoctorFinderHubApi.Repository.DoctorRepo.Implementations;
 using DoctorFinderHubApi.Repository.DoctorRepo.Interfaces;
 
@@ -34,6 +34,8 @@ builder.Services.AddScoped<IDoctorService,DoctorService>();
 builder.Services.AddScoped<IDoctorRepo, DoctorRepo>();
 
 #endregion
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 
 

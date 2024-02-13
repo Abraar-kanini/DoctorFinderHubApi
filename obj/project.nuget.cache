@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "VcBNHjebl3SWcBVA2SxoTCgWZNxAvj4jEaDpjvld8bbYYfd2fp9JX7Ope2vT5izhamnzbomVBJ8Q3XfaYRTa6w==",
+  "dgSpecHash": "gpj/Ar4koaFtRMFZVaytIMaAeCjc5OYScsHKO9EpdZmTckKEnMa0sW5h/H01bvucIHNkc32TbOiusbUxXdDgRw==",
   "success": true,
   "projectFilePath": "C:\\Users\\Welcome\\Desktop\\DoctorFinderHubApi\\DoctorFinderHubApi.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\Welcome\\.nuget\\packages\\automapper\\13.0.1\\automapper.13.0.1.nupkg.sha512",
     "C:\\Users\\Welcome\\.nuget\\packages\\bouncycastle.cryptography\\2.2.1\\bouncycastle.cryptography.2.2.1.nupkg.sha512",
     "C:\\Users\\Welcome\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
     "C:\\Users\\Welcome\\.nuget\\packages\\mailkit\\4.3.0\\mailkit.4.3.0.nupkg.sha512",
