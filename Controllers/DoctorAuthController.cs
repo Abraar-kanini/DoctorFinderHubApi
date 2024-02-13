@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using AutoMapper;
 using DoctorFinderHubApi.Data;
 using DoctorFinderHubApi.Dto.DoctorAuth;
 using DoctorFinderHubApi.Models;
@@ -24,13 +25,15 @@ namespace DoctorFinderHubApi.Controllers
         private readonly DoctorFinderHubApiDbContext doctorFinderHubApiDbContext;
         private readonly IDoctorService doctorService;
 
-        public DoctorAuthController(DoctorFinderHubApiDbContext doctorFinderHubApiDbContext, IConfiguration configuration, IDoctorService doctorService)
+        public DoctorAuthController(DoctorFinderHubApiDbContext doctorFinderHubApiDbContext,IMapper mapper, IConfiguration configuration, IDoctorService doctorService)
         {
             this.doctorFinderHubApiDbContext = doctorFinderHubApiDbContext;
+            Mapper = mapper;
             Configuration = configuration;
             this.doctorService = doctorService;
         }
 
+        public IMapper Mapper { get; }
         public IConfiguration Configuration { get; }
 
         [HttpPost("DoctorRegister")]
@@ -246,6 +249,36 @@ namespace DoctorFinderHubApi.Controllers
             {
                 return Ok("Doctor approval status updated to Not Approved");
             }
+        }
+
+        [HttpPut]
+        [Route("DoctorProfileUpdate/{id:Guid}")]
+        public async Task<IActionResult> DoctorProfileUpdate([FromRoute] Guid id, [FromBody] DoctorUpdateDto doctorUpdateDto)
+        {
+            var doctor = await doctorFinderHubApiDbContext.doctorAuths.FindAsync(id);
+            if (doctor == null)
+            {
+                ModelState.AddModelError("Doctor", "Doctor Could Not Be Found");
+                return BadRequest(ModelState);
+            }
+
+           
+            if (doctorUpdateDto.DoctorName != null)
+            {
+                doctor.DoctorName = doctorUpdateDto.DoctorName;
+            }
+            if (doctorUpdateDto.Email != null)
+            {
+                doctor.Email = doctorUpdateDto.Email;
+            }
+            if (doctorUpdateDto.doctorSpecialist != null)
+            {
+                doctor.doctorSpecialist = doctorUpdateDto.doctorSpecialist;
+            }
+
+            await doctorFinderHubApiDbContext.SaveChangesAsync();
+
+            return Ok(Mapper.Map<DoctorUpdateDto>(doctor));
         }
 
 
