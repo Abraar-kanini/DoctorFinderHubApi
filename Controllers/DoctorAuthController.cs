@@ -24,18 +24,19 @@ namespace DoctorFinderHubApi.Controllers
     public class DoctorAuthController : ControllerBase
     {
         private readonly DoctorFinderHubApiDbContext doctorFinderHubApiDbContext;
+        private readonly IMapper mapper;
+        private readonly IConfiguration configuration;
         private readonly IDoctorService doctorService;
 
         public DoctorAuthController(DoctorFinderHubApiDbContext doctorFinderHubApiDbContext,IMapper mapper, IConfiguration configuration, IDoctorService doctorService)
         {
             this.doctorFinderHubApiDbContext = doctorFinderHubApiDbContext;
-            Mapper = mapper;
-            Configuration = configuration;
+            this.mapper = mapper;
+            this.configuration = configuration;
             this.doctorService = doctorService;
         }
 
-        public IMapper Mapper { get; }
-        public IConfiguration Configuration { get; }
+        
 
         [HttpPost("DoctorRegister")]
 
@@ -266,7 +267,7 @@ namespace DoctorFinderHubApi.Controllers
            
             await doctorService.DoctorProfileUpdate(doctor, doctorUpdateDto);
 
-           return Ok(Mapper.Map<DoctorUpdateDto>(doctor));
+           return Ok(mapper.Map<DoctorUpdateDto>(doctor));
         }
 
         [HttpGet("GetByApproval")]
@@ -302,7 +303,7 @@ namespace DoctorFinderHubApi.Controllers
 
             await doctorService.DeleteService(doctor);
 
-            return Ok(Mapper.Map<DeleteDto>(doctor));
+            return Ok(mapper.Map<DeleteDto>(doctor));
 
         }
      
