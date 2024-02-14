@@ -10,6 +10,7 @@ using MailKit.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -281,8 +282,42 @@ namespace DoctorFinderHubApi.Controllers
             return Ok(Mapper.Map<DoctorUpdateDto>(doctor));
         }
 
+        [HttpGet("GetByApproval")]
+        public async Task<ActionResult<List<DoctorAuth>>> GetByStatus(string? ApprovalStatus)
+        {
+            var doctor = doctorFinderHubApiDbContext.doctorAuths.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(ApprovalStatus))
+            {
+                if ((ApprovalStatus.Equals("Approved", StringComparison.OrdinalIgnoreCase)) || (ApprovalStatus.Equals("Not Approved", StringComparison.OrdinalIgnoreCase)))
+                {
+                    doctor = doctor.Where(x => x.ApprovalStatus.Contains(ApprovalStatus));
+                }
+                else
+                {
+                    ModelState.AddModelError("Approval Status", $"Approval Status {ApprovalStatus} is not valid");
+                    return NotFound(ModelState);
+                }
+                
+            }
+            return await doctor.ToListAsync();
+        }
 
+        [HttpDelete]
+        [Route("DeleteDoctor/{id:Guid}")]
+        public async Task<IActionResult> DoctorDelete([FromRoute] Guid id)
+        {
+            var doctor = await doctorFinderHubApiDbContext.doctorAuths.FindAsync(id);
+            if(doctor== null)
+            {
+                return BadRequest("Doctor Not Found");
+            }
+            doctorFinderHubApiDbContext.doctorAuths.Remove(doctor);
+            await doctorFinderHubApiDbContext.SaveChangesAsync();
 
+            return Ok(Mapper.Map<DeleteDto>(doctor));
+
+        }
+     
 
     }
 }
