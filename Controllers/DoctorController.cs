@@ -25,7 +25,13 @@ namespace DoctorFinderHubApi.Controllers
         [HttpPost("DoctorImagepost")]
         public async Task<IActionResult> DoctorPost([FromForm]DoctorPostDto doctorPostDto)
         {
+            var doctorid = await finderHubApiDbContext.doctors.FirstOrDefaultAsync(x=>x.DoctorAuthId==doctorPostDto.DoctorAuthId);
+            if (doctorid != null)
+            {
+                return BadRequest("you cant add the images to the same id");
+            }
             ValidateFileUpload(doctorPostDto);
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);  
@@ -37,14 +43,14 @@ namespace DoctorFinderHubApi.Controllers
                     File = doctorPostDto.File,
                     FileExtension = Path.GetExtension(doctorPostDto.File.FileName),
                     FileSizeInBytes = doctorPostDto.File.Length,
-                    fileName = doctorPostDto.File.FileName,
+                    fileName = doctorPostDto.fileName,
                     FileDescription = doctorPostDto.FileDescription,
                     DoctorAuthId=doctorPostDto.DoctorAuthId
                     
                 };
-            
-                var localImagePath= Path.Combine(webHostEnvironment.ContentRootPath, "Images", $"{doctor.fileName}{doctor.FileExtension}");
-                using var stream = new FileStream(localImagePath, FileMode.Create);
+
+                var localimagepath = Path.Combine(webHostEnvironment.ContentRootPath, "Images", $"{doctor.fileName}{doctor.FileExtension}");
+                using var stream = new FileStream(localimagepath, FileMode.Create);
                 await doctor.File.CopyToAsync(stream);
                 var urlfilepath = $"{httpContextAccessor.HttpContext.Request.Scheme}://{httpContextAccessor.HttpContext.Request.Host}{httpContextAccessor.HttpContext.Request.PathBase}/Images/{doctor.fileName}{doctor.FileExtension}";
                 doctor.FilePath = urlfilepath;
