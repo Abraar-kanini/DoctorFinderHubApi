@@ -9,6 +9,7 @@ namespace DoctorFinderHubApi.Mapping
         public MappingProfile()
         {
             CreateMap<DoctorAuth,DoctorUpdateDto>().ReverseMap();
+            CreateMap<DoctorAuth,DeleteDto>().ReverseMap(); 
         }
     }
 }

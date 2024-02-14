@@ -1,6 +1,8 @@
-﻿using DoctorFinderHubApi.Data;
+﻿using System.Numerics;
+using DoctorFinderHubApi.Data;
 using DoctorFinderHubApi.Models;
 using DoctorFinderHubApi.Repository.DoctorRepo.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace DoctorFinderHubApi.Repository.DoctorRepo.Implementations
@@ -19,7 +21,22 @@ namespace DoctorFinderHubApi.Repository.DoctorRepo.Implementations
             await doctorFinderHubApiDbContext.SaveChangesAsync();
         }
 
-       
+        public async Task DeleteRepo(DoctorAuth doctorAuth)
+        {
+           doctorFinderHubApiDbContext.doctorAuths.Remove(doctorAuth);
+            await SaveDoctorAsync();
+           
+            
+        }
+
+        public async Task<List<DoctorAuth>> GetByStatusService(string? ApprovalStatus)
+        {
+            var doctor = doctorFinderHubApiDbContext.doctorAuths.AsQueryable();
+            doctor = doctor.Where(x => x.ApprovalStatus.Contains(ApprovalStatus));
+            return await doctor.ToListAsync();
+
+
+        }
 
         public async Task<List<DoctorAuth>> GetDoctorsAysnc(string? filterOn, string? filterQuery)
         {

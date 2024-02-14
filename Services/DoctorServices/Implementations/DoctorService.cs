@@ -11,6 +11,8 @@ using MimeKit;
 using DoctorFinderHubApi.Repository.DoctorRepo.Interfaces;
 using DoctorFinderHubApi.Data;
 using Microsoft.AspNetCore.Mvc;
+using DoctorFinderHubApi.Dto.DoctorAuth;
+using System.Numerics;
 
 namespace DoctorFinderHubApi.Services.DoctorServices.Implementations
 {
@@ -27,7 +29,7 @@ namespace DoctorFinderHubApi.Services.DoctorServices.Implementations
             this.doctorFinderHubApiDbContext = doctorFinderHubApiDbContext;
         }
 
-        public IDoctorRepo DoctorRepo { get; }
+       
 
         public Task AddDoctorAsync(DoctorAuth doctorAuth)
         {
@@ -68,6 +70,30 @@ namespace DoctorFinderHubApi.Services.DoctorServices.Implementations
 
         }
 
+        public Task DeleteService(DoctorAuth doctorAuth)
+        {
+           return doctorRepo1.DeleteRepo(doctorAuth);
+        }
+
+        public  Task DoctorProfileUpdate(DoctorAuth doctorAuth,DoctorUpdateDto doctorUpdateDto)
+        {
+            if (doctorUpdateDto.DoctorName != null)
+            {
+                doctorAuth.DoctorName = doctorUpdateDto.DoctorName;
+            }
+            if (doctorUpdateDto.Email != null)
+            {
+                doctorAuth.Email = doctorUpdateDto.Email;
+            }
+            if (doctorUpdateDto.doctorSpecialist != null)
+            {
+                doctorAuth.doctorSpecialist = doctorUpdateDto.doctorSpecialist;
+            }
+           return doctorRepo1.SaveDoctorAsync();
+            
+            
+        }
+
         public async Task<List<DoctorAuth>> FilterDoctorsAsyn(string? filterOn, string? filterQuery)
         {
             if (string.IsNullOrWhiteSpace(filterOn) || string.IsNullOrWhiteSpace(filterQuery))
@@ -78,6 +104,10 @@ namespace DoctorFinderHubApi.Services.DoctorServices.Implementations
             return await doctorRepo1.GetDoctorsAysnc(filterOn, filterQuery);
         }
 
+        public Task<List<DoctorAuth>> GetByStatusService(string? ApprovalStatus)
+        {
+            return doctorRepo1.GetByStatusService(ApprovalStatus);
+        }
 
         public Task SaveDoctorAsync()
         {
@@ -101,6 +131,12 @@ namespace DoctorFinderHubApi.Services.DoctorServices.Implementations
             smtp.Authenticate("jabraar01@gmail.com", "vcfg espi csts buzv");
             smtp.Send(emailMessage);
             smtp.Disconnect(true);
+        }
+
+        public Task UpdateApprovalStatus(DoctorAuth doctorAuth, string ApprovalStatus)
+        {
+            doctorAuth.ApprovalStatus = ApprovalStatus;
+            return doctorRepo1.SaveDoctorAsync();
         }
 
         public bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
