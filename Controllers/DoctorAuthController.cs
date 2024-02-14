@@ -213,9 +213,9 @@ namespace DoctorFinderHubApi.Controllers
                 ModelState.AddModelError("DoctorStatus", "Provide me Only Your Available Or Not Available");
                 return BadRequest(ModelState);
             }
-           
-            
-            await doctorFinderHubApiDbContext.SaveChangesAsync();
+
+
+            await doctorService.SaveDoctorAsync();
             return Ok("Your DoctorStatus is Updated ");
 
         }
@@ -239,8 +239,8 @@ namespace DoctorFinderHubApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            doctor.ApprovalStatus = ApprovalStatus;
-            await doctorFinderHubApiDbContext.SaveChangesAsync();
+            await doctorService.UpdateApprovalStatus(doctor, ApprovalStatus);
+          
 
             if (ApprovalStatus.Equals("Approved", StringComparison.OrdinalIgnoreCase))
             {
@@ -264,42 +264,30 @@ namespace DoctorFinderHubApi.Controllers
             }
 
            
-            if (doctorUpdateDto.DoctorName != null)
-            {
-                doctor.DoctorName = doctorUpdateDto.DoctorName;
-            }
-            if (doctorUpdateDto.Email != null)
-            {
-                doctor.Email = doctorUpdateDto.Email;
-            }
-            if (doctorUpdateDto.doctorSpecialist != null)
-            {
-                doctor.doctorSpecialist = doctorUpdateDto.doctorSpecialist;
-            }
+            await doctorService.DoctorProfileUpdate(doctor, doctorUpdateDto);
 
-            await doctorFinderHubApiDbContext.SaveChangesAsync();
-
-            return Ok(Mapper.Map<DoctorUpdateDto>(doctor));
+           return Ok(Mapper.Map<DoctorUpdateDto>(doctor));
         }
 
         [HttpGet("GetByApproval")]
-        public async Task<ActionResult<List<DoctorAuth>>> GetByStatus(string? ApprovalStatus)
+        public async Task<ActionResult<List<DoctorAuth>>> GetByStatus([FromQuery] string? ApprovalStatus)
         {
             var doctor = doctorFinderHubApiDbContext.doctorAuths.AsQueryable();
-            if (!string.IsNullOrWhiteSpace(ApprovalStatus))
+            if (!string.IsNullOrWhiteSpace(ApprovalStatus) && (ApprovalStatus.Equals("Approved", StringComparison.OrdinalIgnoreCase)) || (ApprovalStatus.Equals("Pending", StringComparison.OrdinalIgnoreCase)) || (ApprovalStatus.Equals("Not Approved", StringComparison.OrdinalIgnoreCase)))
             {
-                if ((ApprovalStatus.Equals("Approved", StringComparison.OrdinalIgnoreCase)) || (ApprovalStatus.Equals("Not Approved", StringComparison.OrdinalIgnoreCase)))
-                {
-                    doctor = doctor.Where(x => x.ApprovalStatus.Contains(ApprovalStatus));
-                }
-                else
-                {
-                    ModelState.AddModelError("Approval Status", $"Approval Status {ApprovalStatus} is not valid");
-                    return NotFound(ModelState);
-                }
+
+               var result= await doctorService.GetByStatusService(ApprovalStatus);
+                return result;
+               
                 
             }
-            return await doctor.ToListAsync();
+            else
+            {
+                ModelState.AddModelError("Approval Status", $"Approval Status {ApprovalStatus} is not valid");
+                return NotFound(ModelState);
+            }
+         
+           
         }
 
         [HttpDelete]
@@ -311,8 +299,8 @@ namespace DoctorFinderHubApi.Controllers
             {
                 return BadRequest("Doctor Not Found");
             }
-            doctorFinderHubApiDbContext.doctorAuths.Remove(doctor);
-            await doctorFinderHubApiDbContext.SaveChangesAsync();
+
+            await doctorService.DeleteService(doctor);
 
             return Ok(Mapper.Map<DeleteDto>(doctor));
 

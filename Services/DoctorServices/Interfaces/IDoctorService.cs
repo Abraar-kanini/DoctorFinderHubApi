@@ -1,4 +1,5 @@
-﻿using DoctorFinderHubApi.Models;
+﻿using DoctorFinderHubApi.Dto.DoctorAuth;
+using DoctorFinderHubApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DoctorFinderHubApi.Services.DoctorServices.Interfaces
@@ -18,5 +19,13 @@ namespace DoctorFinderHubApi.Services.DoctorServices.Interfaces
         Task SaveDoctorAsync();
 
         Task<List<DoctorAuth>> FilterDoctorsAsyn(string? filterOn , string? filterQuery);
+
+        Task DeleteService(DoctorAuth doctorAuth);
+
+        Task<List<DoctorAuth>> GetByStatusService(string? ApprovalStatus);
+
+        Task DoctorProfileUpdate(DoctorAuth doctorAuth , DoctorUpdateDto doctorUpdateDto );
+
+        Task UpdateApprovalStatus(DoctorAuth doctorAuth, string ApprovalStatus);
     }
 }
